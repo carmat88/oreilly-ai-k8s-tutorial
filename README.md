@@ -139,6 +139,24 @@ tf-hub-0           ClusterIP   None             <none>        8000/TCP   1m
 tf-hub-lb          ClusterIP   10.100.25.109    <none>        80/TCP     1m
 tf-job-dashboard   ClusterIP   10.104.119.108   <none>        80/TCP     1m
 ```
+*NOTE: if you are using GKE or minikube in other scenarios and getting an error while running the command `$ ks apply default -c kubeflow-core`, such as:*
+```
+$ ks apply default -c kubeflow-core
+INFO Applying configmaps kubeflow.kubeflow-version 
+INFO Creating non-existent configmaps kubeflow.kubeflow-version 
+INFO Applying services kubeflow.tf-hub-0          
+INFO Creating non-existent services kubeflow.tf-hub-0 
+INFO Applying services kubeflow.tf-hub-lb         
+INFO Creating non-existent services kubeflow.tf-hub-lb 
+INFO Applying clusterrolebindings kubeflow.centraldashboard 
+INFO Creating non-existent clusterrolebindings kubeflow.centraldashboard 
+INFO Applying roles kubeflow.jupyter-role         
+INFO Creating non-existent roles kubeflow.jupyter-role 
+ERROR handle object: creating object: creating object: roles.rbac.authorization.k8s.io "jupyter-role" is forbidden: attempt to grant extra privileges: [PolicyRule{Resources:["pods"], APIGroups:[""], Verbs:["get"]} PolicyRule{Resources:["pods"], APIGroups:[""], Verbs:["watch"]} PolicyRule{Resources:["pods"], APIGroups:[""], Verbs:["list"]} PolicyRule{Resources:["pods"], APIGroups:[""], Verbs:["create"]} PolicyRule{Resources:["pods"], APIGroups:[""], Verbs:["delete"]} PolicyRule{Resources:["persistentvolumeclaims"], APIGroups:[""], Verbs:["get"]} PolicyRule{Resources:["persistentvolumeclaims"], APIGroups:[""], Verbs:["watch"]} PolicyRule{Resources:["persistentvolumeclaims"], APIGroups:[""], Verbs:["list"]} PolicyRule{Resources:["persistentvolumeclaims"], APIGroups:[""], Verbs:["create"]} PolicyRule{Resources:["persistentvolumeclaims"], APIGroups:[""], Verbs:["delete"]} PolicyRule{Resources:["events"], APIGroups:[""], Verbs:["get"]} PolicyRule{Resources:["events"], APIGroups:[""], Verbs:["watch"]} PolicyRule{Resources:["events"], APIGroups:[""], Verbs:["list"]}] user=&{matteo.carone88@gmail.com  [system:authenticated] map[user-assertion.cloud.google.com:[AF1jyJAJJ/sQu2gA0l2zfozNzE254lfMkKSvgAMyFVTwdXBdHvX88uq57bG0lICNC+1wEmPb0HWziuEZqgan4oClBYl6K3XI4WIiY2K080hLDZFyRQNbGZ3Dys9aQKauKYoVZ03IjE2Ex5uJbg/2VPDuUIcDwomtfo1ltnbydUmKJ/gYEMdqjItkXY2+TzrZAuj5+9CyvJl1mchHFTLCgxUEcGEcVQ6BYIGQbLU+Y4GYP7g=]]} ownerrules=[PolicyRule{Resources:["selfsubjectaccessreviews" "selfsubjectrulesreviews"], APIGroups:["authorization.k8s.io"], Verbs:["create"]} PolicyRule{NonResourceURLs:["/api" "/api/*" "/apis" "/apis/*" "/healthz" "/swagger-2.0.0.pb-v1" "/swagger.json" "/swaggerapi" "/swaggerapi/*" "/version"], Verbs:["get"]}] ruleResolutionErrors=[]
+```
+
+*then you need to create a ClusterRoleBinding making your self a cluster admin. For example when using GKE this can be achieved as follows:*
+`kubectl create clusterrolebinding default-admin --clusterrole=cluster-admin --user="$(gcloud config get-value account --verbosity=error)"`
 
 ## 3. Deploy Pachyderm and Seldon on top of KubeFlow
 
